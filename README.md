@@ -4,9 +4,11 @@ A self-assessment checklist that helps software engineers check their own machin
 
 It is a single HTML page: no build step, no install, no data leaves your browser.
 
+**Live site:** https://prince-71-cloud.github.io/machineCompromiseChecklist/
+
 ## How to use
 
-1. Open `machine-compromise-checklist.html` in any web browser.
+1. Open the [live site](https://prince-71-cloud.github.io/machineCompromiseChecklist/), or open `machine-compromise-checklist.html` in any web browser.
    - Locally: double-click the file, or run `xdg-open machine-compromise-checklist.html` (Linux) / `open machine-compromise-checklist.html` (macOS) / `start machine-compromise-checklist.html` (Windows).
    - Or clone the repo first:
      ```bash
@@ -38,4 +40,4 @@ The page also includes:
 ## Notes
 
 - Fonts load from Google Fonts. Offline, the page still works with fallback system fonts.
-- To share it with your team, host the HTML file anywhere static (GitHub Pages, an internal wiki or a file share).
+- The site is served by GitHub Pages from the `main` branch. `index.html` redirects to the checklist page.
