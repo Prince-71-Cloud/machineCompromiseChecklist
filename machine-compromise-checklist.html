@@ -1,0 +1,506 @@
+<title>Machine Compromise Detection Checklist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #f5f6f7;
+  --surface: #ffffff;
+  --fg: #1a1a1a;
+  --muted: #666666;
+  --line: #e0e0e0;
+  --accent: #0066cc;
+  --alert: #d32f2f;
+  --alert-soft: #ffebee;
+  --warning: #f57c00;
+  --warning-soft: #fff3e0;
+  --success: #388e3c;
+  --success-soft: #e8f5e9;
+  --code-bg: #f5f5f5;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121212;
+    --surface: #1e1e1e;
+    --fg: #e0e0e0;
+    --muted: #999999;
+    --line: #404040;
+    --accent: #4da6ff;
+    --alert: #ff6b6b;
+    --alert-soft: #3a1515;
+    --warning: #ffb74d;
+    --warning-soft: #3a2a10;
+    --success: #66bb6a;
+    --success-soft: #1b3a1b;
+    --code-bg: #2a2a2a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121212;
+  --surface: #1e1e1e;
+  --fg: #e0e0e0;
+  --muted: #999999;
+  --line: #404040;
+  --accent: #4da6ff;
+  --alert: #ff6b6b;
+  --alert-soft: #3a1515;
+  --warning: #ffb74d;
+  --warning-soft: #3a2a10;
+  --success: #66bb6a;
+  --success-soft: #1b3a1b;
+  --code-bg: #2a2a2a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.6 "Inter", system-ui, sans-serif; margin: 0; }
+.wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+h1 { font-family: "Archivo", sans-serif; font-size: 2.2rem; font-weight: 700; margin: 0 0 8px 0; }
+h2 { font-family: "Archivo", sans-serif; font-size: 1.4rem; font-weight: 700; margin: 32px 0 16px 0; border-bottom: 2px solid var(--line); padding-bottom: 8px; }
+h3 { font-family: "Archivo", sans-serif; font-size: 1.08rem; font-weight: 600; margin: 20px 0 12px 0; }
+p { margin: 0 0 12px 0; max-width: 70ch; }
+code { font-family: "JetBrains Mono", monospace; font-size: 0.9em; background: var(--code-bg); padding: 2px 6px; border-radius: 3px; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 4px; overflow-x: auto; font-size: 0.85em; line-height: 1.5; border-left: 3px solid var(--accent); }
+
+.header-note { color: var(--muted); font-size: 0.95rem; margin: 16px 0 24px 0; }
+.section { margin-bottom: 32px; }
+.check-item { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 16px; margin-bottom: 12px; display: flex; gap: 12px; align-items: flex-start; }
+.check-box { width: 24px; height: 24px; border: 2px solid var(--line); border-radius: 4px; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+.check-box.checked { background: var(--success); border-color: var(--success); color: white; }
+.check-content { flex: 1; min-width: 0; }
+.check-content strong { display: block; margin-bottom: 4px; }
+.check-content p { margin: 6px 0; }
+.cmd { background: var(--code-bg); padding: 8px 12px; border-radius: 3px; font-family: "JetBrains Mono", monospace; font-size: 0.85em; margin: 8px 0; display: block; overflow-x: auto; }
+.alert-box { background: var(--alert-soft); border-left: 4px solid var(--alert); padding: 12px 14px; border-radius: 3px; margin: 12px 0; font-size: 0.95rem; }
+.warning-box { background: var(--warning-soft); border-left: 4px solid var(--warning); padding: 12px 14px; border-radius: 3px; margin: 12px 0; font-size: 0.95rem; }
+.success-box { background: var(--success-soft); border-left: 4px solid var(--success); padding: 12px 14px; border-radius: 3px; margin: 12px 0; font-size: 0.95rem; }
+.tab-buttons { display: flex; gap: 8px; margin: 16px 0; flex-wrap: wrap; }
+.tab-btn { padding: 8px 16px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 4px; cursor: pointer; font-weight: 500; font-family: "Archivo", sans-serif; }
+.tab-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.flag-red { color: var(--alert); font-weight: 600; }
+.flag-yellow { color: var(--warning); font-weight: 600; }
+.flag-green { color: var(--success); font-weight: 600; }
+.summary { background: var(--surface); border: 2px solid var(--accent); padding: 16px; border-radius: 6px; margin: 24px 0; }
+.summary-row { display: flex; justify-content: space-between; margin: 8px 0; }
+</style>
+
+<div class="wrap">
+  <h1>🔍 Machine Compromise Detection</h1>
+  <p class="header-note">Self-assessment checklist for software engineers. Run the commands on your own machine to detect signs of compromise, malware, or unauthorized access.</p>
+
+  <div class="tab-buttons">
+    <button class="tab-btn active" onclick="showTab('linux')">Linux / Kali</button>
+    <button class="tab-btn" onclick="showTab('mac')">macOS</button>
+    <button class="tab-btn" onclick="showTab('windows')">Windows</button>
+  </div>
+
+  <!-- LINUX TAB -->
+  <div id="linux" class="tab-content active">
+    <h2>Linux / Kali Checks</h2>
+
+    <div class="section">
+      <h3>1. User Accounts & Login Activity</h3>
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check for unexpected user accounts</strong>
+          <p>Look for users with UID 0 (root access) or unusual system accounts:</p>
+          <span class="cmd">awk -F: '$3==0 {print}' /etc/passwd</span>
+          <p class="flag-red">🚩 Red flag:</p> Any user besides <code>root</code> with UID 0
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Review recent logins</strong>
+          <span class="cmd">last -n 20</span>
+          <p class="flag-red">🚩 Red flag:</p> Logins at unusual times, from unknown IPs, or when you weren't at the machine
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check failed login attempts</strong>
+          <span class="cmd">lastb -n 20</span>
+          <p class="flag-red">🚩 Red flag:</p> Many failed attempts = brute force attack
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>2. Network & Connections</h3>
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>List all listening ports</strong>
+          <span class="cmd">sudo netstat -tlnp | grep LISTEN</span>
+          <p class="flag-red">🚩 Red flag:</p> Open ports you don't recognize (SSH on 22, HTTP on 80 are normal)
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check active connections</strong>
+          <span class="cmd">sudo netstat -tnp | grep ESTABLISHED</span>
+          <p class="flag-red">🚩 Red flag:</p> Connections to unknown IP addresses, especially to public cloud (AWS, Azure)
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check DNS queries</strong>
+          <span class="cmd">sudo tcpdump -i any -n 'udp port 53' -c 50 2>/dev/null | grep -oE '[a-z0-9.-]+oast\.|interact\.sh'</span>
+          <p class="flag-red">🚩 Red flag:</p> DNS lookups to <code>*.oast.online</code>, <code>interact.sh</code>, or unknown C2 domains
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>3. Processes & Services</h3>
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>List all running processes</strong>
+          <span class="cmd">ps aux | grep -v grep | sort -k3 -r | head -20</span>
+          <p class="flag-red">🚩 Red flag:</p> Processes with unusual names, running from <code>/tmp</code>, or with root privileges you didn't start
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check cron jobs (scheduled tasks)</strong>
+          <span class="cmd">for user in $(cut -f1 -d: /etc/passwd); do echo "=== $user ==="; crontab -u $user -l 2>/dev/null; done</span>
+          <p class="flag-red">🚩 Red flag:</p> Cron jobs you don't recognize, running <code>wget</code>, <code>curl</code>, or shells from internet
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check for rootkits</strong>
+          <span class="cmd">sudo chkrootkit 2>/dev/null | grep -i "infected\|warning"</span>
+          <p class="flag-red">🚩 Red flag:</p> Any "Infected" or "Warning" messages
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>4. Files & Permissions</h3>
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check for SUID binaries (can escalate privilege)</strong>
+          <span class="cmd">find / -perm -4000 2>/dev/null | head -20</span>
+          <p class="flag-yellow">⚠️ Warning:</p> Look for unusual binaries; standard ones like <code>sudo</code>, <code>passwd</code> are normal
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check for SSH keys added to your account</strong>
+          <span class="cmd">cat ~/.ssh/authorized_keys</span>
+          <p class="flag-red">🚩 Red flag:</p> Keys you don't recognize = remote access backdoor
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check shell history for suspicious commands</strong>
+          <span class="cmd">grep -E 'wget|curl|nc|bash|sh' ~/.bash_history ~/.zsh_history | tail -30</span>
+          <p class="flag-red">🚩 Red flag:</p> Commands downloading and executing code from the internet
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>5. System Files & Integrity</h3>
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check if SSH daemon was modified</strong>
+          <span class="cmd">sudo stat /etc/ssh/sshd_config | grep Modify</span>
+          <p class="flag-red">🚩 Red flag:</p> Recent modification when you didn't change it
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check sudoers file for backdoors</strong>
+          <span class="cmd">sudo cat /etc/sudoers | grep -v '#' | grep -v '^$'</span>
+          <p class="flag-red">🚩 Red flag:</p> Lines you don't recognize that grant sudo without password
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MACOS TAB -->
+  <div id="mac" class="tab-content">
+    <h2>macOS Checks</h2>
+
+    <div class="section">
+      <h3>1. User Accounts & Login</h3>
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>List all user accounts</strong>
+          <span class="cmd">dscl . list /Users | grep -v '^_'</span>
+          <p class="flag-red">🚩 Red flag:</p> Accounts you don't recognize, especially with admin privileges
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check recent login history</strong>
+          <span class="cmd">log show --predicate 'process == "loginwindow"' --last 1h</span>
+          <p class="flag-red">🚩 Red flag:</p> Logins you don't remember making
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>2. Network & Connections</h3>
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check listening ports</strong>
+          <span class="cmd">lsof -i -P -n | grep LISTEN</span>
+          <p class="flag-red">🚩 Red flag:</p> Services listening on ports you didn't start
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Monitor DNS queries</strong>
+          <span class="cmd">log stream --predicate 'process == "mDNSResponder"' --level debug 2>&1 | grep -i 'oast\|interact'</span>
+          <p class="flag-red">🚩 Red flag:</p> DNS to <code>*.oast.online</code> or <code>interact.sh</code>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>3. Processes & Malware</h3>
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check for suspicious processes</strong>
+          <span class="cmd">ps aux | sort -k3 -r | head -15</span>
+          <p class="flag-red">🚩 Red flag:</p> Processes with high CPU/memory that you don't recognize
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check installed LaunchAgents (persistence)</strong>
+          <span class="cmd">ls -la ~/Library/LaunchAgents/ /Library/LaunchAgents/</span>
+          <p class="flag-red">🚩 Red flag:</p> .plist files you don't recognize, especially from <code>/Library</code> (requires admin)
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Scan with built-in malware removal</strong>
+          <span class="cmd">sudo /Library/Application\ Support/CrashReporter/DiagnosticMessagesHistory.plist</span>
+          <p>Or use: Malwarebytes, CleanMyMac, or similar third-party scanner</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>4. Files & SSH Keys</h3>
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check SSH authorized keys</strong>
+          <span class="cmd">cat ~/.ssh/authorized_keys</span>
+          <p class="flag-red">🚩 Red flag:</p> Keys you don't recognize
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check browser extensions & plugins</strong>
+          <p>System Preferences → Extensions → look for unfamiliar extensions</p>
+          <p class="flag-red">🚩 Red flag:</p> Extensions from unknown publishers
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WINDOWS TAB -->
+  <div id="windows" class="tab-content">
+    <h2>Windows Checks</h2>
+    <p class="header-note">Run PowerShell as Administrator for most commands. Type <code>powershell</code> in the search bar, right-click and select "Run as administrator".</p>
+
+    <div class="section">
+      <h3>1. User Accounts & Logins</h3>
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>List all user accounts</strong>
+          <span class="cmd">Get-LocalUser</span>
+          <p class="flag-red">🚩 Red flag:</p> Accounts you don't recognize, especially with admin status
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check recent login events</strong>
+          <span class="cmd">Get-EventLog -LogName Security -InstanceId 4624 -Newest 20</span>
+          <p class="flag-red">🚩 Red flag:</p> Logins at odd times or from remote sessions you didn't initiate
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>2. Network & Connections</h3>
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check listening ports</strong>
+          <span class="cmd">netstat -ano | findstr LISTENING</span>
+          <p class="flag-red">🚩 Red flag:</p> Unknown services listening, especially on ports 3389 (RDP), 4444, 5555
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check active network connections</strong>
+          <span class="cmd">netstat -ano | findstr ESTABLISHED</span>
+          <p class="flag-red">🚩 Red flag:</p> Connections to foreign IPs you don't recognize, especially C2 domains
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check DNS cache for suspicious domains</strong>
+          <span class="cmd">ipconfig /displaydns | findstr oast</span>
+          <p class="flag-red">🚩 Red flag:</p> Lookups to <code>*.oast.online</code>, <code>interact.sh</code>, or unknown C2
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>3. Processes & Services</h3>
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>List all running processes</strong>
+          <span class="cmd">Get-Process | Sort-Object -Property CPU -Descending | Select-Object -First 20</span>
+          <p class="flag-red">🚩 Red flag:</p> Unknown processes, especially from <code>C:\Temp</code> or <code>C:\Users\[name]\AppData</code>
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check Windows services for backdoors</strong>
+          <span class="cmd">Get-Service | Where-Object {$_.Status -eq 'Running'} | Select-Object Name, DisplayName</span>
+          <p class="flag-red">🚩 Red flag:</p> Services you don't recognize, especially with odd names
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check scheduled tasks</strong>
+          <span class="cmd">Get-ScheduledTask | Where-Object {$_.State -eq 'Ready'} | Select-Object TaskName, TaskPath</span>
+          <p class="flag-red">🚩 Red flag:</p> Tasks that run executables from temp folders or download code
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>4. Files & Registry</h3>
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check temp folders for suspicious files</strong>
+          <span class="cmd">Get-ChildItem C:\Temp, C:\Windows\Temp, $env:TEMP -File -Recurse -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 20</span>
+          <p class="flag-red">🚩 Red flag:</p> Recently created .exe, .ps1, .bat files
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Check browser plugins & extensions</strong>
+          <p>Settings → Extensions (in Edge/Chrome/Firefox)</p>
+          <p class="flag-red">🚩 Red flag:</p> Extensions from unknown publishers, especially that access all sites
+        </div>
+      </div>
+
+      <div class="check-item">
+        <div class="check-box" onclick="this.classList.toggle('checked')"></div>
+        <div class="check-content">
+          <strong>Scan with Windows Defender</strong>
+          <span class="cmd">Update-MpPreference -DisableRealtimeMonitoring $false; Start-MpScan -ScanType FullScan</span>
+          <p>Or use Malwarebytes, Windows Defender Offline if you suspect rootkit</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMMON SECTION -->
+  <div class="section" style="margin-top: 48px;">
+    <h2>What If You Find Something?</h2>
+    <div class="alert-box">
+      <strong>Do not panic or shut down.</strong> Abrupt shutdown may destroy forensic evidence. Instead:
+    </div>
+
+    <ol style="line-height: 1.8; margin: 16px 0;">
+      <li><strong>Isolate the machine.</strong> Disconnect from network (WiFi and Ethernet). Keep it running.</li>
+      <li><strong>Take a snapshot.</strong> If you're in a VM, take a snapshot. If not, take photos/screenshots of suspicious output.</li>
+      <li><strong>Document everything.</strong> Screenshot command outputs, note timestamps, save terminal history.</li>
+      <li><strong>Alert security team.</strong> Send an email to your security/IT team with:
+        <ul>
+          <li>What you found (specific output)</li>
+          <li>When you found it</li>
+          <li>The commands you ran</li>
+          <li>Do NOT include full logs or sensitive data in the email</li>
+        </ul>
+      </li>
+      <li><strong>Do not use the machine for work.</strong> Wait for forensics team to image it.</li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <h2>Prevention Going Forward</h2>
+    <ul style="line-height: 1.8;">
+      <li><strong>Keep OS and tools updated.</strong> Run <code>sudo apt update && apt upgrade</code> (Linux) or Windows Update regularly</li>
+      <li><strong>Use a password manager.</strong> Unique, strong passwords for every account</li>
+      <li><strong>Enable MFA.</strong> Multi-factor authentication on email, GitHub, AWS, all accounts</li>
+      <li><strong>Rotate API keys.</strong> Remove plaintext credentials from shell history: <code>history -c</code></li>
+      <li><strong>Use a VPN.</strong> When on public WiFi, use a company or reputable VPN</li>
+      <li><strong>Lock down SSH.</strong> Disable password auth: <code>PasswordAuthentication no</code> in <code>/etc/ssh/sshd_config</code></li>
+      <li><strong>Whitelist cron jobs.</strong> Review what's scheduled monthly</li>
+      <li><strong>Scan before committing.</strong> Never commit API keys, credentials or secrets to version control</li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+function showTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  document.querySelector(`[onclick="showTab('${tab}')"]`).classList.add('active');
+}
+</script>
